@@ -1,0 +1,130 @@
+= Oracle DBMS_OUTPUT vs PostgreSQL RAISE
+:toc:
+:toc-title: 목차
+
+== 개요
+*DBMS_OUTPUT* : PL / SQL에서 디버깅 용도 또는 클라이언트에게 메시지를 출력하기 위해서 사용되는 패키지 입니다.
+
+*RAISE* : 에러 또는 메시지를 클라이언트에게 또는 로그에 출력하는데 사용됩니다.
+
+== 예시
+
+=== Oracle
+[source, sql]
+----
+SET SERVEROUTPUT ON;
+BEGIN
+DBMS_OUTPUT.PUT_LINE(‘hello world’);
+END;
+/
+
+hello world
+PL/SQL procedure successfully completed;
+----
+
+=== PostgreSQL
+[source, sql]
+----
+SET CLIENT_MIN_MESSAGES = ‘debug’;
+-- Oracle SET SERVEROUTPUT ON 과 동일
+
+DO $$
+  BEGIN
+    RAISE DEBUG USING MESSAGE := ‘hello world’;
+  END $$;
+
+DEBUG: hello world
+DO 
+----
+
+[width 500, options=header, cols="5*^"]
+.*DBMS_OUTPUT vs RAISE 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|호환 여부
+|비고
+
+|OUTPUT MESSAGE 사용
+|SET SERVEROUTPUT ON
+또는
+DBMS_OUTPUT.ENABLE(20000)
+|SET CLIENT_MIN_MESSAGES = ‘debug’;
+SET LOG_MIN_MESSAGES = ‘info’;
+|Δ
+|
+
+|OUTPUT MESSAGE 사용 중지
+|SET SERVEROUTPUT OFF
+또는
+DBMS_OUTPUT.DISABLE
+|SET CLIENT_MIN_MESSAGES = ‘notice’;
+SET LOG_MIN_MESSAGES = ‘info’;
+|Δ
+|
+
+|버퍼에 저장된 메시지 중에서 읽지 않은 가장 오래된 메시지를 반환합니다.
+|GET_LINE
+|지원되지 않습니다.
+|X
+|
+
+|버퍼에 저장된 메시지 중에서 읽지 않은 메시지들을 집합 형태로 반환합니다.
+|GET_LINES
+|지원되지 않습니다.
+|X
+|
+
+|버퍼에 메시지를 저장합니다.
+|PUT_LINE DBMS_OUTPUT.PUT_LINE ('The employee id is:' \|\| v_jobid \|\| ' and his last name is:' \|\| v_last- name);
+|RAISE  RAISE NOTICE 'The employee id is: % and his last name is: %', v_jobid, v_lastname;
+|Δ
+|문법상의 차이가 크고 동작 레벨을 지정해야 하는 등 차이점이 많아서 매뉴얼에 대한 참고가 필요합니다.
+
+|가장 최근의 Exception Code를 반환합니다.
+|SQLCODE + SQLERRM
+|SQLSTATE + SQLERRM
+|Δ
+|기능은 동일하나 문법상의 차이가 있어서 다시 작성해야 합니다.
+
+|Error-number argument와 관련된 에러 메시지를 반환합니다.
+|DECLARE
+Name employees.last_ name%TYPE;
+BEGIN
+SELECT last_name INTO name FROM employees
+WHERE employee_id = -1; EXCEPTION
+WHEN OTHERS then DBMS_OUTPUT.PUT_LINE
+('Error code ' \|\| SQLCODE \|\| ': ' \|\| sqlerrm);
+END;
+/
+|do $$
+declare
+Name employees%ROWTYPE; 
+BEGIN
+SELECT last_name INTO name FROM employees WHERE employee_id = -1; EXCEPTION
+WHEN OTHERS then
+RAISE NOTICE 'Error code %: %', sqlstate, sqlerrm;
+end$$;
+|Δ
+|기능은 동일하나 문법상의 차이가 있어서 다시 작성해야 합니다.
+|====
+
+== 전환방법
+*호환성 : 보통* + 
+문법과 기능의 차이가 많아서, 코드를 재작성 해야합니다. + 
+
+
+*변환 방법* + 
+ 전체적인 코드를 PostgreSQL문법에 맞게 재작성 해야 합니다. + 
+  + 
+
+Ex)  + 
+SQLCODE ==> SQLSTATE + 
+PUT_LINE ==> RAISE +
+
+
+자세한 사항은 xref:https://www.postgresql.org/docs/14/plpgsql-errors-and-messages.html#[PostgreSQL 매뉴얼]을 참고하시기 바랍니다.
+
+
+

@@ -1,0 +1,6 @@
+= UTL_FILE
+:toc:
+:toc-title:
+
+PostgreSQL에는 내장 기능과 동일한 UTL_FILE이 없습니다.
+PostgreSQL orafce extension 이 사용 가능한 경우 Oracle의 UTL_FILE 기능에 대한 대체 솔루션입니다

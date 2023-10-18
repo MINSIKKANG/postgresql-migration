@@ -1,0 +1,48 @@
+= Common Table Expression
+:toc:
+:toc-title: 목차
+
+== 개요
+Common Table Expression(CTEs)는 SELECT, INSERT, UPDATE, DELETE 또는 CREATE VIEW 문 하나의 실행 범위 내에서 정의되는 임시 결과 집합입니다. + 
+순차적인 코드의 로직을 구현하거나, 코드를 재사용 하는 방법을 제공합니다. +  
+
+ + 
+
+서브쿼리의 이름을 지정해서 다른 여러 쿼리에서 사용할 수 있으며, ANSI SQL-99 표준을 준수하고 오라클 9.2버전 부터 지원했던 ‘WITH’절을 사용해서 구현됩니다.  +
+
+CTE는 개체로 저장되지 않고 쿼리 지속 시간 동안만 존재한다는 점에서 파생 테이블과 비슷하나, CTE는 파생 테이블과 달리 자체 참조가 가능하며 동일 쿼리에서 여러 번 참조할 수 있습니다.
+
+== 예시
+
+=== Oracle
+[source, sql]
+----
+WITH DEPT_COUNT (DEPARTMENT_ID, DEPT_COUNT) AS (SELECT DEPARTMENT_ID, COUNT(*) FROM EMPLOYEES GROUP BY DEPARTMENT_ID)
+
+SELECT E.FIRST_NAME ||‘ ‘|| E.LAST_NAME AS EMP_NAME, D.DEPT_COUNT AS EMP_DEPT_COUNT
+FROM EMPLOYEES E JOIN DEPT_COUNT D
+USING (DEPARTMENT_ID)
+ORDER BY 2;
+----
+
+=== PostgreSQL
+[source, sql]
+----
+WITH DEPT_COUNT (DEPARTMENT_ID, DEPT_COUNT) AS (SELECT DEPARTMENT_ID, COUNT(*) FROM EMPLOYEES GROUP BY DEPARTMENT_ID)
+
+SELECT E.FIRST_NAME ||‘ ‘|| E.LAST_NAME AS EMP_NAME, D.DEPT_COUNT AS EMP_DEPT_COUNT
+FROM EMPLOYEES E JOIN DEPT_COUNT D
+USING (DEPARTMENT_ID)
+ORDER BY 2;
+----
+
+
+== 전환방법
+
+호환성 : 높음 + 
+
+Oracle과 PostgreSQL 모두 동일한 기능 및 문법을 가집니다.
+
+- 변환 방법 + 
+** 동일한 기능 및 문법을 가지므로 변환이 필요하지 않습니다. + 
+

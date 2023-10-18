@@ -1,0 +1,124 @@
+= Trigger
+:toc:
+:toc-title: 목차
+
+== 개요
+
+
+== 비교
+*PostgreSQL 에서 System Triggers 는 지원되지 않습니다.*
+
+*PL/SQL -> PL/pgSQL 문법의 차이가 있으며, Oracle 의 Trigger 조건부는 PostgreSQL에서 Trigger로 구현되며, 선언부 같은 경우 Function으로 선언됩니다.*
+
+
+* Oracle
+----
+CREATE OR REPLACE TRIGGER EMP_JOB_HISTORY
+    AFTER UPDATE OF JOB_ID, DEPARTMENT_ID ON EMPLOYEES
+        FOR EACH ROW
+            BEGIN
+                INSERT INTO JOB_HISTORY (EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID)
+                VALUES(:OLD.EMPLOYEE_ID,
+                :OLD.HIRE_DATE, SYSDATE,
+                :OLD.JOB_ID,
+                :OLD.DEPARTMENT_ID);
+            END;
+----
+
+
+* PostgreSQL
+----
+--선언부
+CREATE OR REPLACE FUNCTION trigger_fct_emp_job_history()
+    RETURNS trigger AS $BODY$
+        BEGIN
+            INSERT INTO JOB_HISTORY(EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID)
+            VALUES (OLD.EMPLOYEE_ID,
+            OLD.HIRE_DATE, statement_timestamp(),
+            OLD.JOB_ID,
+            OLD.DEPARTMENT_ID);
+            RETURN NEW;
+        END
+    $BODY$
+ LANGUAGE 'plpgsql' SECURITY DEFINER;
+
+--조건부
+CREATE TRIGGER emp_job_history
+        AFTER UPDATE OF job_id,department_id ON employees 
+        FOR EACH ROW
+        EXECUTE PROCEDURE trigger_fct_emp_job_history();
+----
+
+== 문법상 차이
+
+[options="header",cols=""]
+|====================
+|Trigger Operation Type |Oracle |PostgreSQL
+
+|Enable a trigger
+|ALTER TRIGGER <TriggerName> ENABLE;
+|ALTER TABLE <TableName> ENABLE TRIGGER <TriggerName>;
+
+|Disable a trigger
+|ALTER TRIGGER <TriggerName> DISABLE;
+|ALTER TABLE <TableName> DISABLE TRIGGER <TriggerName>;
+
+|Trigger Alteration
+|CREATE OR REPLACE TRIGGER…;
+|CREATE OR REPLACE TRIGGER…; 
+
+CREATE OR REPLACE FUNCTION…;
+
+|Trigger Drop
+|DROP TRIGGER <TriggerName>;
+|DROP TRIGGER <TriggerName> ON <TableName>;
+
+|Addressing OLD and NEW values
+|:NEW.<ColumnName>
+
+:OLD.<ColumnName>
+
+|.NEW.<ColumnName>
+
+.OLD.<ColumnName>
+
+|Row-Level
+|…
+
+BEFORE UPDATE ON <TableName> FOR EACH ROW
+…
+
+|…
+
+UPDATE ON <TableName> FOR EACH ROW
+EXECUTE PROCEDURE <FuncName>();
+
+|Statement-Level
+|…
+
+BEFORE UPDATE ON <TableName>
+
+…
+|UPDATE ON <TableName>
+
+EXECUTE PROCEDURE <FuncName>();
+
+|DDL Level
+|…
+
+BEFORE DROP ON <SchemaName>
+
+…
+|…
+
+ON ddl_command_start
+
+EXECUTE PROCEDURE <FuncName>;
+
+|Database/System Level
+|CREATE TRIGGER <TrigName> BEGIN
+ON DATABASE SHUTDOWN
+
+…
+|N/A
+|====================

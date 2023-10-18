@@ -1,0 +1,6 @@
+= EXECUTE IMMEDIATE
+:toc:
+:toc-title:
+
+구문상의 차이로 인해 코드 재작성이 필요할 수 있습니다.
+IMMEDIATE 키워드를 제거하고 EXECUTE 및 PREPARE PostgreSQL 커맨드를 사용합니다.

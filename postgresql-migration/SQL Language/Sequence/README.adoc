@@ -1,0 +1,91 @@
+*Oracle 과 PostgreSQL 구문이 다릅니다.*
+
+[cols="5,5"]
+|====================
+|Oracle |PostgreSQL
+
+|CREATE SEQUENCE order_id_seq +
+START WITH 10000 +
+INCREMENT BY 1 +
+MAXVALUE 99999999999 +
+CACHE 20 +
+NOCYCLE;
+
+|CREATE SEQUENCE order_id_seq +
+START WITH 10000 +
+INCREMENT BY 1 +
+MAXVALUE 99999999999 +
+MINVALUE 1 +
+CACHE 20;
+|====================
+
+
+** *PostgreSQL Sequence Comparison Table*
+[cols="3,7"]
+|====================
+|Oracle |PostgreSQL |Description |PostgreSQL Default Value
+|START WITH |START WITH
+|오름차순 시퀀스에는 MINVALUE를 사용하고 내림차순 시퀀스에는 MAXVALUE를 사용하는 선택적 매개변수입니다. 
+|1
+
+|INCREMENT BY |INCREMENT BY
+|추가된 양수/오름차순 또는 음수/내림차순 값에 따라 값을 순차적으로 위 또는 아래로 변경하는 선택적 매개변수입니다.
+|1
+
+|MAXVALUE / +
+NO MAXVALUE 
+|MAXVALUE/NO MAXVALUE
+|MAXVALUE 를 설정하거나 +
+NO MAXVALUE 로 해당 기능을 비활성화합니다.
+|ascending upper limit 2^63-1 +
+descending lower limit -1
+
+|MINVALUE / +
+NO MINVALUE 
+|MINVALUE/NO MINVALUE
+|MINVALUE 를 설정하거나 +
+NO MINVALUE 로 해당 기능을 비활성화합니다.
+|ascending upper limit 1 +
+descending lower limit -2^63-1
+
+|CYCLE / NO CYCLE |CYCLE / NO CYCLE
+|MAXVALUE 또는 MINVALUE에 도달한 경우에도 Sequence 가 값을 계속 생성할 수 있도록 합니다. 이 시점에서 시스템은 원래 MAXVALUE 또는 MINVALUE(설정 값에서 다시 시작)를 기반으로 새 값을 생성합니다. 
+|NOCYCLE 이 기본값
+
+|CACHE / NO CACHE |CACHE
+|캐시되는 값의 수를 지정합니다. 기본적으로 CACHE는 최소 1개의 값을 저장합니다.
+|CACHE 매개변수가 지정되지 않은 경우 시퀀스 값은 Oracle NOCACHE 매개변수와 동일한 메모리에 사전 캐시됩니다.
+
+|Sequence 값을 테이블 컬럼의 디폴트 값으로 설정 +
+ex) create table test (id integer default sequence_name.nextval);
+|Sequence 값을 테이블 컬럼의 디폴트 값으로 설정 +
+ex) create table test (id integer default nextval('sequence_name'));
+|문법의 차이가 있음
+|X
+
+
+|Session / Global |TEMPORARY/TEMP
+|세션이 끝날 때 시퀀스가 자동으로 삭제됨을 의미하는 임시 시퀀스입니다.
+| X
+
+|X
+|IF NOT EXISTS
+|같은 이름의 다른 시퀀스를 덮어쓰는 시퀀스를 만듭니다.
+| X
+
+|X
+|OWNED BY/OWNED BY NONE
+|시퀀스 개체와 테이블의 특정 열 간의 연결을 지정합니다. 이 시퀀스를 삭제하면 시퀀스/테이블 연결로 인해 오류가 반환됩니다.
+| OWNED BY NONE은 기본값이며 연결이 없음을 지정합니다.
+
+|X
+|AS
+|최대값과 최소값을 설정하는 동안 Sequence Data Type 을 지정하기 위한 옵션: SMALLINT, INTEGER 및 BIGINT
+| BIGINT
+
+|Identity columns
+|Identity columns
+|
+|X
+
+|====================

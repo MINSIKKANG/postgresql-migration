@@ -1,0 +1,17 @@
+= Read-Only Table
+:toc:
+:toc-title: 목차
+
+== 개요
+테이블의 데이터를 수정하거나 삭제하는 권한 없이, 읽을 수 있는 권한만 가진 테이블을 Read-Only Table이라고 합니다. + 
+
+== 비교
+Oracle은 Read-Only 모드를 설정 및 해제함으로써 설정이 가능합니다. + 
+PostgreSQL은 테이블에 대한 Read-only 모드 설정을 지원하지 않습니다.
+
+
+== 변환방법
+
+1. 특정 테이블에 대해 Read-Only 권한만 가진 Role을 생성하여 사용하는 방법 + 
+2. 특정 데이터베이스를 Read-Only 모드로 변경하는 방법. + 
+3. Exception을 일으키는 Fucntion을 생성 후, 원하는 테이블에 대해서 INSERT, UPDATE, DELETE, TRUNCATE시에 Function을 실행 시키는 트리거를 생성해서 사용하는 방법

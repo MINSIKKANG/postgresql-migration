@@ -1,0 +1,33 @@
+Oracle과 유사하게 PostgreSQL은 데이터베이스의 Statistics를 사용하고 결과를 + 
+pg_statistic 시스템 카탈로그에 저장하여 데이터베이스 Optimizer(PostgreSQL의 쿼리 플래너)를 제공합니다. +
+쿼리 플래너는 수집된 통계를 사용하여 특정 쿼리에 대한 가장 효율적인 실행 계획을 결정합니다.
+
+*Oracle and PostgreSQL Statistics Collection 비교표*
+
+[options="header",cols="2,5,3"]
+|====================
+|Statistics Property | Oracle | PostgreSQL
+
+| Gather statistics at schema level
+| begin +
+execute dbms_stats.gather_schema_stats(ownname => user); +
+end;
+| ANALYZE;
+
+| Gather statistics at table level
+| begin +
+dbms_stats.gather_table_stats(ownname => user, tabname => tableName); +
+end;
+| ANALYZE <TableName>;
+
+| Sampling only a segment from table total rows
+| begin +
+dbms_stats.gather_schema_stats(estimate_percent => 60,ownname => user); +
+end;
+|set default_statistics_target to 150; +
+ANALYZE <TableName>;
+
+| Statistics Metadata View
+| SELECT * FROM DBA_TAB_STATS_HISTORY;
+| SELECT * FROM PG_STAT_ALL_TABLES;
+|====================

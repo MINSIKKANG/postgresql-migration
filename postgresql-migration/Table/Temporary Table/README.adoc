@@ -1,0 +1,80 @@
+= Temporary Table
+:toc:
+:toc-title:
+
+== 개요
+
+* 주요 차이점 : PostgreSQL Global Temporary Tables 은 여러 세션에서 읽을 수 없고 세션 종료 후 삭제 됩니다.
+
+[width 500, options=header, cols="4*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|비고
+
+|Semantic
+|Global Temporary Table
+|Temporary Table / Temp Table
+|
+
+|CREATE TABLE
+|CREATE GLOBAL TEMPORARY...
+|CREATE TEMPORARY... 또는 CREATE TEMP...
+|
+
+|멀티 세션으로 부터의 액세스 가능 여부
+|O
+|X
+|
+
+|세션이 끝나거나 DB 재기동시에도 TABLE DDL이 남아있도록 설정이 가능한지 여부
+|O
+|X
+|PostgreSQL Temporary Table은 세션 종료시에 삭제됩니다.
+
+|CREATE INDEX 지원
+|O
+|O
+|
+
+|Foreign key 지원
+|X
+|O
+|
+
+|ON COMMIT default
+|COMMIT DELETE ROWS
+|ON COMMIT PRESERVE ROWS
+|
+
+|PRESERVE ROWS 지원
+|O
+|O
+|
+
+|DELETE ROWS 지원
+|O
+|O
+|
+
+
+|ALTER TABLE support
+|O
+|O
+|
+
+|Gather statistics
+|DBMS_STATS.gather_table.stats
+|ANALYZE
+|
+
+|Oracle 12c GLOBAL_TEMP_TABLE_STATS
+|DBMS_STATS.set_table_prefs
+|ANALYZE
+|
+
+|====
+
+== 전환 방법

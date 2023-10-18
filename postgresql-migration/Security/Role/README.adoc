@@ -1,0 +1,129 @@
+= Roles
+:toc:
+:toc-title: 목차
+
+
+== 개요
+Oracle의 Role은 데이터베이스 유저들에게 부여된 권한들의 집합이라고 볼 수 있다. + 
+PostgreSQL의 Role은 User와 동일한 개념이며, Oracle의 Role과 같은 역할을 하기 위해서는 로그인 권한을 주지 않은 상태로 Role을 생성하여, 상속시키면 같은 역할을 할 수 있다.
+
+
+== 비교
+[width 500, options=header, cols="4*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|비고
+
+|모든 Role 조회
+|SELECT * FROM dba_roles;
+|SELECT * FROM pg_roles;
+|
+
+|Role 생성
+|CREATE ROLE local_role1;  또는  CREATE ROLE c##common_role;
+|CREATE ROLE test_role;
+|
+
+|Role 권한 상속
+|GRANT local_role TO local_role2;
+|GRANT myrole1 TO myrole2;
+|
+
+|Role에 특정 권한 부여
+|GRANT CREATE TABLE TO local_role;
+|GRANT CREATE ON DATABASE postgres TO local_role;
+|PostgreSQL은 Role이 모든 데이터베이스에 공유되므로(Oracle의 CommonUser와 같음), 특정 데이터베이스를 지정 해주어야 한다.
+
+|모든 User 조회
+|SELECT * FROM dba_users;
+|SELECT * FROM pg_user;
+|
+
+|Database 유저 생성
+|CREATE USER c##test_user IDENTIFIED BY test_user;
+|CREATE USER test_user WITH LOGIN PASSWORD 'test_user';
+|문법 및 권한 부여 방식의 차이가 있음
+
+|유저의 패스워드 변경
+|ALTER USER c##test_user IDENTIFIED BY new_password;
+|ALTER USER test_user WITH PASSWORD 'new_password'
+|시놉시스의 차이가 있음
+
+|외부 인증
+|Externally identified users
+|지원되지 않음
+|
+
+|테이블스페이스 사용 제한
+|ALTER USER c##test_user QUOTA UNLIMITED ON TABLESPACE tbs1;
+|지원되지 않음
+|
+
+|role 권한을 유저에게 부여
+|GRANT role1 TO c##test_user;
+|GRANT role1 TO test_user;
+|
+
+|유저 잠금
+|ALTER USER c##test_user ACOOUNT LOCK;
+|ALTER USER test_user WITH NOLOGIN;
+|
+
+|유저 잠금 해제
+|ALTER USER c##test_user ACCOUNT UNLOCK;
+|ALTER user test_user WITH LOGIN;
+|
+
+|권한 부여
+|GRANT CREATE TABLE TO c##test_user;
+|GRANT CREATE ON DATABASE 데이터베이스명 TO test_user;
+|PostgreSQL은 Role이 모든 데이터베이스에 공유 되므로(오라클의 CommonUser와 같음), 데이터베이스를 지정하여 권한을 주어야 한다.
+
+|기본 테이블스페이스 지정
+|ALTER USER c##test_user DEFAULT TABLESPACE tbs1;
+|ALTER USER test_user SET DEFAULT_TABLESPACE = 'tbs1';
+|
+
+|특정 TABLE에 대한 SELECT 권한 부여
+|GRANT SELECT ON hr.employees to c##test_user;
+|GRANT SELECT ON hr.employees TO test_user;
+|
+
+|특정 TALBE에 대한 DML권한 부여
+|GRANT INSERT, DELETE ON hr.employees to c##test_user;
+|GRANT INSERT, DELETE ON hr.employees TO test_user;
+|
+
+|EXECUTE 권한 부여
+|GRANT EXECUTE ON hr.procedure_name TO c##test_user;
+|GRANT EXECUTE ON FUNCTION "FUNCTION_NAME"() TO test_user;
+|()괄호 안에는 함수의 arguements type에 대한 명시를 해주어야 합니다.
+
+|한 유저에 대한 최대 동시 접속자 수 제한
+|CREATE PROFILE app_users LIMIT SESSIONS_PER_USER 5;
+
+ALTER USER c##test_user PROFILE app_users;
+|ALTER ROLE test_user WITH CONNECTION LIMIT 5;
+|
+
+|새로운 스키마 생성
+|CREATE USER my_app_schema IDENTIFIED BY password
+|CREATE SHCEMA myapp_schema;
+|PostgreSQL과 Oracle의 아키텍쳐가 다름
+
+|====
+
+== 전환 방법
+
+*호환성 : 중간*
+
+PostgreSQL의 Role은 User와 동일하게 사용되며, LOGIN 권한을 이용해서 Oracle의 Role 시스템을 비슷하게 구성할 수 있다. + 
+
+- 변환 방법
+** Oracle의 local_role은 PostgreSQL에서 존재하지 않으므로, NOLOGIN 권한을 이용해서 role을 생성하여 유저에게 상속시키는 방법으로 대체할 수 있다.
+**PostgreSQL은 role에 권한을 부여할 때 모든 데이터베이스에 동시에 권한을 부여하는 기능을 지원하지 않으므로, 각 데이터베이스 마다 권한을 부여 하는 방식으로 진행해야 한다.
+** Oracle과 PostgreSQL의 아키텍처의 차이로 Schema의 개념 범위가 다르기 때문에, xref:https://hypersql.github.io/postgresql-knowledge/postgresql-internals/chapter01/index.html#[아키텍쳐 문서]를 참조하시기 바랍니다.
+** 자세한 Role에 대한 설명은 xref:https://www.postgresql.org/docs/14/user-manag.html#[PostgreSQL 14 매뉴얼]을 참고하시기 바랍니다.

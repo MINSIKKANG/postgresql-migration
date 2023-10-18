@@ -1,0 +1,155 @@
+= PROCEDURE
+:toc:
+:toc-title: 목차
+:sectlinks:
+:sectnums:
+
+== 개요
+- postgreSQL (Procedure) : https://www.postgresql.org/docs/current/sql-createprocedure.html
+
+여러가지 SQL을 하나의 SQL 처럼 정리하여 사용하고자 하는 것. 실행결과를 반환 하지 않습니다. + 
+
+== PROCEDURE 문법
+ 
+=== PL/SQL
+[source, sql]
+----
+CREATE [OR REPLACE] PROCEDURE procedure_name
+( Parameter name 1  in or out datatype,
+  Parameter name 2 in or out datatype, ....  )    
+IS  (AS)       
+     declaration;     
+     [ ..... ]
+     BEGIN         
+     <function_body>         
+     [ ..... ]
+     EXCEPTION  // 필수아님 
+END;
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+CREATE [ OR REPLACE ] PROCEDURE procedure_name 
+( Parameter name 1 datatype,
+  Parameter name 2 datatype, ....  )
+AS (IS)
+$$
+DECLARE
+     declaration;     
+     [ ..... ]
+     BEGIN 
+           <function_body>
+           [ .... ] 
+           EXCEPTION 문장  // 필수아님
+     END ;  
+$$ LANGUAGE plpgsql ; 
+
+----
+
+== Example 
+
+=== PL/SQL
+[source, sql]
+----
+CREATE OR REPLACE PROCEDURE "HYPERSQL".MEMBER_CHECK(MEMBER_ID NUMBER, Uniq_ID NUMBER)
+IS       
+    CURSOR CUR1 IS
+      SELECT MEMBER_ID, Uniq_ID
+  	  FROM   HPS_MEMBER 
+	  WHERE  MEMBER_ID = 123
+      AND    Uniq_ID = 0;
+
+      C1 CUR1%ROWTYPE;
+BEGIN
+     
+    FOR C1 IN CUR1 LOOP
+       UPDATE   HPS_MEMBER
+       SET      Uniq_ID  = C1.Unique_ID
+       WHERE    MEMBER_ID  = C1.MEMBER_ID
+       AND      Uniq_ID = C1.Uniq_ID;
+    END LOOP; 
+END;
+
+
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION HYPERSQL.MEMBER_CHECK(MEMBER_ID INT, Uniq_ID INT) RETURNS VOID
+AS $$
+DECLARE       
+    CUR1 CURSOR FOR
+      SELECT MEMBER_ID, Uniq_ID
+  	  FROM   HPS_MEMBER 
+	  WHERE  MEMBER_ID = 123
+      AND    Uniq_ID = 0;
+
+      C1 CUR1%ROWTYPE;
+BEGIN
+     
+    FOR C1 IN CUR1 LOOP
+       UPDATE   HPS_MEMBER
+       SET      Uniq_ID  = C1.Unique_ID
+       WHERE    MEMBER_ID  = C1.MEMBER_ID
+       AND      Uniq_ID = C1.Uniq_ID;
+    END LOOP; 
+END;
+$$ LANGUAGE plpgsql;
+----
+
+
+
+
+
+[width 500, options=header, cols="5*^"]
+.*PROCEDURE 비교 표*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|호환 여부
+|비고
+
+|Print 
+|dbms_output.put_lines
+|raise notice  
+|X
+|
+
+|INOUT 매개변수  
+|IN, OUT,INOUT 
+|IN, INOUT 
+|O
+|postgreSQL 14 버전 이후 IN, OUT, INOUT 다 지원 가능 : https://www.migops.com/blog/stored-procedure-out-parameters-in-postgresql-14/
+
+|EXECUTE IMMEDIATE 구문
+|EXECUTE IMMEDIATE
+|EXECUTE 
+|X
+|
+
+ 
+
+|====
+
+
+== 전환방법
+
+- Schema
+** "Schema_name" 구문을 Schema_name 으로 변경하여 사용해야 합니다.
+
+- DECLARE 
+** IS 구문을 AS $variable_name$ DECLARE 으로 변경하여 Body 문 시작 하셔야 합니다.
+
+- procedure end 구문
+** END [procedure_name] 구문을 END $variable_name$ 로 변경 후 LANGUAGE plpgsql; 추가 하여 사용해야 합니다. 
+
+
+*변환 방법* + 
+Column Data Type만 PostgreSQL에 맞는 타입으로 변환하면 됩니다. + 
+ Data Type은 xref:../../Table/Common Data Types/README.adoc#[Table]항목을 참고
+

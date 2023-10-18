@@ -1,0 +1,38 @@
+= Inline View
+:toc:
+:toc-title: 목차
+
+== 개요
+미리 생성하여 사용하는 View가 아닌, FROM절에서 SELECT문을 이용해서 일회성으로 생성 및 사용하는 View 입니다.
+
+== 예시
+
+=== Oracle
+[source, sql]
+----
+SELECT A.LAST_NAME, A.SALARY, A.DEPARTMENT_ID, B.SAL_AVG
+FROM EMPLOYEES A,
+(SELECT DEPARTMENT_ID, ROUND(AVG(SALARY)) AS SAL_AVG FROM EMPLOYEES GROUP BY DEPARTMENT_ID) B
+WHERE A.DEPARTMENT_ID = B.DEPARTMENT_ID;
+
+----
+
+=== PostgreSQL
+[source, sql]
+----
+SELECT A.LAST_NAME, A.SALARY, A.DEPARTMENT_ID, B.SAL_AVG
+FROM EMPLOYEES A,
+(SELECT DEPARTMENT_ID, ROUND(AVG(SALARY)) AS SAL_AVG FROM EMPLOYEES GROUP BY DEPARTMENT_ID) B
+WHERE A.DEPARTMENT_ID = B.DEPARTMENT_ID;
+----
+
+== 전환 방법
+
+*호환성 : 매우 높음* + 
+ 
+
+Oracle과 PostgreSQL의 문법 및 기능이 모두 동일합니다. + 
+변환시 주의 사항으로는, PostgreSQL은 Inline view의 alias를 반드시 입력해주어야 한다는 점이 있습니다.
+
+
+

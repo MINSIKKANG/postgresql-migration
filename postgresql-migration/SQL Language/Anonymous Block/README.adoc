@@ -1,0 +1,51 @@
+= Anonymous Block
+:toc:
+:toc-title: 목차
+
+== 개요
+PL/SQL(Procedural Language extension to SQL)을 이용해 작성된 코드 블록이며, 데이터베이스에 프로시져, 펑션, 패키지 등 처럼 저장해서 재사용 하는 코드 블록이 *아닌 경우* 를 말한다.
+
+== 예시
+
+=== Oracle
+[source, sql]
+----
+SET SERVEROUTPUT ON;
+BEGIN
+DBMS_OUTPUT.PUT_LINE(‘hello world’);
+END;
+/
+
+hello world
+PL/SQL procedure successfully completed;
+
+----
+
+=== PostgreSQL
+[source, sql]
+----
+SET CLIENT_MIN_MESSAGES = ‘debug’;
+-- Oracle SET SERVEROUTPUT ON 과 동일
+
+DO $$
+  BEGIN
+    RAISE DEBUG USING MESSAGE := ‘hello world’;
+  END $$;
+
+DEBUG: hello world
+DO
+
+----
+
+
+== 전환방법
+
+호환성 : 높음 + 
+
+Anonymous Block 기능 자체에 대해서는 동일하게 지원. + 
+하지만, PL / SQL과 PL / PGSQL의 문법 차이가 있어서, 코드를 직접 재작성 해야한다. + 
+
+- 변환 방법 + 
+** PL / SQL 과 PL / PGSQL 문법이 다르기 때문에, 변환이 필요함 + 
+** PL / SQL 문법은 xref:PLSQL/README.adoc#[PLSQL]항목을 참고
+

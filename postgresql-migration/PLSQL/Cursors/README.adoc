@@ -1,0 +1,180 @@
+= Cursors
+:toc:
+:toc-title: 목차
+
+== 개요
+PL / SQL cursors는 어플리케이션 로직에서 사용되는 dataset에 대한 반복이 가능한 포인터입니다. + 
+dataset은 SQL 실행 결과 rows들 가지고 있습니다. + 
+커서는 프로그램에서 참조할 수 있습니다. + 
+
+Oracle의 커서 종류
+
+- Implicit Cursors
+** 커서에 대한 직접적인 선언 없이, PL/SQL이 DML이 실행될 때 자동으로 생성해서 사용하는 커서입니다.
+** SQL 커서라고도 불립니다.
+- Explicit Cursors
+** 선언되거나 구조화 되는 등의 모든 관리가 유저에 의해서 이루어지는 커서입니다.
+** 이름을 지정하여 관리하므로, 이름을 이용하여 커서를 참조할 수 있습니다.
+** Named 커서라고도 불립니다.
+- Ref Cursors
+** 동적으로 커서가 가리키는 위치를 변경할 수 있는 커서입니다.
+
+== 예시
+
+=== Oracle
+[source, sql]
+----
+DECLARE
+  CURSOR c1 IS
+    SELECT last_name, job_id FROM employees
+    v_lastname employees. last_name%TYPE;
+    v_jobid employees.job_id%TYPE;
+BEGIN
+  OPEN c1;
+    LOOP
+      FETCH c1 INTO v_lastname, v_jobid;
+      EXIT WHEN c1%NOTFOUND;
+    END LOOP;
+  CLOSE c1;
+END;
+
+----
+
+=== PostgreSQL
+[source, sql]
+----
+DO $$
+DECLARE
+  c1 CURSOR FOR SELECT last_name, job_id FROM employees
+  lastname varchar;
+  jobid integer;
+BEGIN
+  OPEN c1;
+  FETCH c1 INTO lastname, jobid;
+END$$;  
+----
+
+[width 500, options=header, cols="5*^"]
+.*Cursor 비교 표*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|호환 여부
+|비고
+
+|bound explicit cursor 선언
+|CURSOR c1 IS SELECT * FROM employees;
+|c1 CURSOR FOR SELECT * FROM employees; 
+|Δ
+|PostgreSQL은 커서 정의 방법이 여러개이며, 그에 따라 문법이 달라서 재작성 해야함.
+
+|CURSOR OPEN
+|OPEN c1;
+|OPEN c1;
+|O
+|
+
+|커서를 다음 row로 이동 시키고, 변수에 값을 fetch하는 동작
+|FETCH c1 INTO rowvar; (rowvar는 DECLARE 섹션에서 사전에 정의됨.)
+|FETCH c1 INTO rowvar; (rowvar는 DECLARE 섹션에서 사전에 정의됨.)
+|O
+|
+
+
+|커서를 다음 row로 이동 시키고, 여러개의 데이터 타입에 값을 fetch 하는 동작.
+|FETCH c1 INTO emp_id, emp_name, salary;
+|FETCH c1 INTO emp_id, emp_name, salary;
+|O
+|
+
+|LOOP를 이용해 Implicit Cursor를 반복하는 동작
+|FOR item IN ( SELECT last_name, job_id FROM employees 
+WHERE job_id 
+LIKE '%CLERK%' AND manager_ id > 120 ORDER BY 
+last_ name ) 
+LOOP << do something >> 
+END LOOP;
+|FOR item IN ( SELECT last_name, job_id FROM employees 
+WHERE job_id 
+LIKE '%CLERK%' AND manager_id > 120 ORDER BY last_name ) 
+LOOP << do something >> END LOOP;
+|O
+|
+
+|파라미터를 사용하는 커서를 선언하는 동작
+|CURSOR c1 (key NUMBER) IS SELECT * FROM employees WHERE id = key;
+|c1 CURSOR (key integer) FOR SELECT * FROM employees WHERE id = key;
+|Δ
+|문법이 달라서 재작성이 필요함.
+
+|파라미터 값과 함께 CURSOR를 OPEN
+|OPEN c1(2);
+|OPEN c1(2);
+OPEN c1(key :=2);
+|O
+|PostgreSQL은 같은 기능을 하는 다른 문법을 추가적으로 제공합니다.
+
+|데이터가 더이상 없을 경우, LOOP 종료
+|EXIT WHEN c1%NOTFOUND;
+|EXIT WHEN NOTFOUND;
+|Δ
+|문법이 달라서 재작성이 필요함.
+
+|커서의 dataset에 rows가 남아있을 경우를 정의
+|%FOUND
+|FOUND
+|Δ
+|문법이 달라서 재작성이 필요함.
+
+|CURSOR에 의해 영향을 받은 모든 rows의 수
+|%ROWCOUNT
+|GET DIAGNOSTICS
+counts_var = ROW_COUNT;
+|Δ
+|문법이 달라서 재작성이 필요함.
+
+|해당 DML을 수행하면서 영향받은 rows의 수
+|EXIT WHEN c1%NOTFOUND;
+|EXIT WHEN NOT FOUND;
+|Δ
+|문법이 달라서 재작성이 필요함.
+
+|DML을 수행하면서 발생한 에러들에 대한 저장된 정보를 불러옵니다.
+|%BULK_EXCEPTIONS
+|지원하지 않습니다.
+|X
+|
+
+|CURSOR가 OPEN 상태인지 확인합니다.
+|%ISOPEN
+|지원하지 않습니다.
+|X
+|문법이 달라서 재작성이 필요함.
+
+
+|CURSOR의 dataset에 rows가 더 이상 남아있지 않을 경우
+|%NOTFOUND
+|NOT FOUND
+|Δ
+|문법이 달라서 재작성이 필요함.
+|====
+
+== 전환방법
+*호환성 : 높음* + 
+Cursor 타입은 Implicit, Explicit, Ref 모두 지원합니다. + 
+Cursor 기능 대부분을 지원하지만 아래와 같은 대책이 필요합니다. + 
+
+- 문법 변환이 필요합니다.
+** PL/SQL과 PL/PGSQL 문법이 다르기 떄문에 변환이 필요합니다.
+
+- PostgreSQL에서 지원되지 않는 아래의 Oracle 함수들에 대한 변환 대책이 필요합니다.
+** %ISOPEN
+** %BULK_EXCEPTIONS
+** BULK_ROWCOUNT
+
+
+*변환 방법* + 
+ IDENTITY COLUMN 기능을 그대로 사용시 Table의 Column Data Type만 PostgreSQL에 맞는 타입으로 변환하면 됩니다. + 
+ Data Type은 xref:../../Table/Common Data Types/README.adoc#[Table]항목을 참고
+

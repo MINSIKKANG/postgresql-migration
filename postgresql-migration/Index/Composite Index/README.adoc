@@ -1,0 +1,32 @@
+= Composite Index
+:toc:
+:toc-title: 목차
+
+== 개요
+키 값을 여러개를 가지는 인덱스 입니다. + 
+PostgreSQL 용어로는 Multi-column Index 입니다. + 
+
+== 비교
+[width 500, options=header, cols="4*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|비고
+
+|Btree Index 생성
+|CREATE INDEX IDX_BTR_1 ON employee(emp_id, EMAIL);
+|CREATE INDEX IDX_BTR_1 ON employee(emp_id, EMAIL);
+또는
+
+CREATE INDEX IDX_BTR_1 ON employee USING BTREE(emp_id, EMAIL);
+|동일
+
+|====
+
+== 전환방법
+
+*호환성 : 매우 높음* + 
+
+전환시 고려 사항 없음.

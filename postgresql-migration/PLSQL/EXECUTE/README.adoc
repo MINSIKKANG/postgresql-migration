@@ -1,0 +1,14 @@
+*Oracel 구문상의 차이로 인해 코드 재작성이 필요할 수 있습니다.*
+
+*PostgreSQL에서는 IMMEDIATE 키워드를 제거하고 EXECUTE 및 PREPARE 커맨드를 사용합니다.*
+
+* Example
+[option="header",cols="4,5,1"]
+|====================
+|PL/SQL|PL/pgSQL
+
+|EXECUTE IMMEDIATE CREATE USER P_USER_NAME IDENTIFIED BY P_USER_PASSWD; +
+ 
+|EXECUTE CREATE ROLE P_USER_NAME WITH LOGIN ENCRYPTED PASSWORD P_USER_PASSWD;
+
+|====================

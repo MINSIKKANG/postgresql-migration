@@ -1,0 +1,107 @@
+= TRIGGER
+:toc:
+:toc-title: 목차
+:sectlinks:
+:sectnums:
+
+== 개요
+
+- postgreSQL (Trigger) : https://www.postgresql.org/docs/current/sql-createtrigger.html
+
+특정 테이블에 DML 문이 수행 되었을 때 자동으로 호출하게 만들어 주는 것. + 
+
+== TRIGGER 문법
+ 
+=== PL/SQL
+[source, sql]
+----
+CREATE [ OR REPLACE ] TRIGGER trigger_name
+ BEFORE | AFTER
+ trigger_event  ON table_name
+[ FOR EACH ROW ]
+[ WHEN (condition) ]
+PL/SQL block
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+
+CREATE [ OR REPLACE ] TRIGGER trigger_name
+BEFORE | AFTER 
+     trigger_event ON table_name
+     [ FOR EACH ROW | STATEMENT ]
+           EXECUTE PROCEDURE trigger_function 
+
+----
+
+== Example 
+
+=== PL/SQL
+[source, sql]
+----
+CREATE OR REPLACE TRIGGER INSERT_MEMBER
+ AFTER INSERT ON MEMBER FOR EACH ROW
+BEGIN
+	INSERT INTO MEMBER VALUES ( :NEW.MEMBER_ID,2,3);
+ END IF;
+END;
+
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION INSERT_MEMBER() RETURNS TRIGGER 
+ AS $$
+BEGIN
+	INSERT INTO MEMBER VALUES (NEW.MEMBER_ID , 2,3 );
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+----
+
+[width 500, options=header, cols="5*^"]
+.*TRIGGER 비교 표*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|호환 여부
+|비고
+
+|Body 구문 차이  
+|DECLARE
+    declaration statements
+
+BEGIN
+    executable statements
+
+EXCEPTION
+    exception_handling statements
+
+END;
+|FUNCTION 에 TRIGGER 선언으로 대체 
+|Δ
+|postgreSQL은 Function Body 문을 trigger 안에 설정 할 수 없어 새로운 Function으로 재 정의 필요.
+
+ 
+
+
+|====
+
+
+== 전환방법
+
+- Schema 
+** "Schema_name" 구문을 Schema_name 으로 변경하여 사용해야 합니다.
+
+- Body 구문
+** DECLARE, BEGIN 구문이 있을시 Function RETURNS TRIGGER 로 TRIGGER 구문 생성  
+
+*변환 방법* + 
+ Table의 Column Data Type만 PostgreSQL에 맞는 타입으로 변환하면 됩니다. + 
+ Data Type은 xref:../../Table/Common Data Types/README.adoc#[Table]항목을 참고
+

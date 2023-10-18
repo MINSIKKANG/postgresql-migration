@@ -1,0 +1,22 @@
+= Partitioned Indexes
+:toc:
+:toc-title: 목차
+
+== 개요
+로컬 및 글로벌 인덱스는 Oracle 데이터베이스의 분할된 테이블에 사용됩니다.
+PostgreSQL에는 Oracle의 로컬 및 글로벌 인덱스에 대한 직접적인 동등한 기능이 없습니다.
+
+== 비교
+[width 500, options=header, cols="3*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|Oracle |PostgreSQL |비고
+
+|Local / Global Index
+| X
+| PostgreSQL에는 Oracle의 로컬 및 글로벌 인덱스에 대한 직접적인 동등한 기능이 없습니다. 그러나 자식 테이블에 생성된 인덱스는 Oracle의 
+로컬 인덱스와 유사하게 동작합니다.
+
+|====
+
+== 전환방법

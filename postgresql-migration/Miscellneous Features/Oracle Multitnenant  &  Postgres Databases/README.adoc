@@ -1,0 +1,7 @@
+= Oracle MultiTenant  /  Postgres Databases
+:toc:
+:toc-title:
+
+오라클과 다른 아키텍쳐를 기반으로 하기 때문에 유사하게 구현하는 방법이 전부다.
+비즈니스 로직을 다양한 DB(영업, 마케팅, HR 등)로 분리하거나 
+Oracle 스키마를 특정 PostgreSQL DB로 마이그레이션하여 구현할 수 있다.

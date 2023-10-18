@@ -1,0 +1,24 @@
+= Invisible Index
+:toc:
+:toc-title: 목차
+
+== 개요
+Invisible Index 기능은 데이터베이스 관리자에게 옵티마이저가 무시하는 인덱스를 생성하거나 +
+기존 인덱스를 변경할 수 있는 기능을 제공합니다. +
+
+
+== 비교
+[width 500, options=header, cols="3*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|Oracle |PostgreSQL |비고
+
+|Invisible Indexes
+|지원하지 않음
+|
+|====
+
+== 전환방법
+*호환성 : 매우 낮음* + 
+
+전환시 고려 사항 없음.

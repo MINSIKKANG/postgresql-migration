@@ -1,0 +1,27 @@
+[options="header",cols=""]
+|====================
+|Oracle Constraint | PostgreSQL Constraint | PostgreSQL Support
+
+|Primary Key |Primary Key | Supported
+|Foreign Key |Foreign Key | Supported
+|Check |Check | Supported
+|Unique |Unique | Supported
+|Not Null |Not Null |Supported
+|DEFERRABLE |DEFERRABLE |Supported
+|NOT DEFERRABLE |NOT DEFERRABLE |Supported
+|SET CONSTRAINT |SET CONSTRAINT |Supported
+|INITIALLY IMMEDIATE | INITIALLY IMMEDIATE |Supported
+|ENABLE |기본값이며 변경할 수 없음 |Supported
+|ENABLE VALIDATE |기본값이며 변경할 수 없음 |Supported
+|ENABLE NOVALIDATE| NOT VALID|같은 기능으로 대체 
+|USING_INDEX_CLAUSE |table_constraint_using_index |Supported
+|Metadata : DBA_CONSTRAINT |Metadata : PG_CONSTRAINT |Supported
+
+|REF |N/A |Not Supported
+|DISABLE VALIDATE |N/A |Not Supported
+|DISABLE NOVALIDATE |N/A |Not Supported
+|View Constraints |N/A |Not Supported
+
+|DISABLE | ... | 공식적으로 지원하지 않으나, NOT VALID를 이용해 대체할 수 있음.
+|ENABLE NOVALIDATE | ... | 공식적으로 지원하지 않으나, NOT VALID를 이용해 대체할 수 있음.
+|====================

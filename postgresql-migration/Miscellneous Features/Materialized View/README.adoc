@@ -1,0 +1,60 @@
+= Materialized View
+:toc:
+:toc-title:
+
+== 개요
+일반 View와 다르게 물리적인 테이블의 형태로 생성되는 뷰이다. + 
+자주 사용되는 View의 결과를 디스크에 저장하는 개념으로써, 매 번 내장된 쿼리를 실행하는 일반 View 보다 집계 함수등의 계산이 빈번하게 이뤄지는 경우 등에서 더 나은 성능을 보여준다.
+
+== 비교
+
+[width 500, options=header, cols="4*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|비고
+
+|Materialized View 생성
+|CREATE MATERIALIZED VIEW mv1 AS SELECT * FROM employee;
+|CREATE MATERIALIZED VIEW mv1 AS SELECT * FROM employee;
+|
+
+|Materialized View의 Refresh (Manual)
+|DBMS_MVIEW.REFRESH('mv1','cf');
+|REFRESH MATERIALIZED VIEW mv1;
+|문법이 다르고, PostgreSQL은 refresh 메소드에 대한 파라미터를 지원하지 않음
+
+|온라인 refresh
+|CREATE MATERIALIZED VIEW mv1 REFRESH FAST ON COMMIT AS SELECT * FROM employee;
+|CREATE OR REPLACE FUNCTION refresh_mv1() returns trigger language plpgsql as $$ begin
+refresh materialized view mv1;
+return null;
+end $$;
+
+CREATE TRIGGER refresh_mv1 after insert of update or delete or truncate on employee for each statement execute procedure refresh_mv1();
+|Automatic Refresh를 PostgreSQL은 지원하지 않아서 함수 + 트리거의 조합으로 대체
+
+|변경된 사항에 대해서만 refresh
+|CREATE MATERIALIZED VIEW LOG ON employee INCLUDING NEW VALUES; CREATE MAATERIALIZED VIEW mv REFRESH FAST AS SELECT * FROM employee;
+|지원되지 않음
+|
+
+|Materialized View의 데이터에 대한 DML을 지원하는지?
+|지원
+|지원되지 않음
+|
+
+|====
+
+== 전환방법
+
+*호환성 : 중간* 
+
+- 자동 Refresh가 지원되지 않음
+** Function + Trigger를 이용해 대체할 수 있음.
+
+- 증분 Refresh가 지원되지 않음
+** Extension(pg_ivm)을 이용해 대체할 수 있음.
+

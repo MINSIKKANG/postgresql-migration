@@ -1,0 +1,8 @@
+= Index-Organized Tables
+:toc:
+:toc-title:
+
+PostgreSQL은 Index-Organized Tables 를 지원하지 않지만 부분적인 해결 방법은 가능합니다.
+
+Oracle IOT는 테이블 생성 중에 정의되며 데이터 정렬을 유지합니다(IOT는 항상 정렬된 상태로 유지됨).
+PostgreSQL CLUSTER는 영구 정렬을 제공하지 않습니다. 일회성 작업입니다. 이후에 테이블이 업데이트되면 변경 사항이 클러스터링/정렬되지 않습니다. 정렬을 적용하려면 필요에 따라 PostgreSQL CLUSTER 문을 사용하여 테이블을 다시 클러스터링합니다.

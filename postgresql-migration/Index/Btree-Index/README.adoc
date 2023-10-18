@@ -1,0 +1,32 @@
+= Btree Index
+:toc:
+:toc-title: 목차
+
+== 개요
+B-tree 자료구조를 기반으로 만들어진 인덱스 입니다. + 
+인덱스 생성 시, 인덱스 타입을 지정하지 않으면 기본으로 설정되는 인덱스 입니다. + 
+
+== 비교
+[width 500, options=header, cols="4*^"]
+.*Oracle vs PostgreSQL 차이점 비교*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|비고
+
+|Btree Index 생성
+|CREATE INDEX IDX_BTR_1 ON employee(emp_id);
+|CREATE INDEX IDX_BTR_1 ON employee(emp_id);
+또는
+
+CREATE INDEX IDX_BTR_1 ON employee USING BTREE(emp_id);
+|동일
+
+|====
+
+== 전환방법
+
+*호환성 : 매우 높음* + 
+
+전환시 고려 사항 없음.

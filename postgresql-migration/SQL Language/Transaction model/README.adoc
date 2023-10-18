@@ -1,0 +1,109 @@
+= Transaction Model
+:toc:
+:toc-title: 목차
+
+== 개요
+
+=== Isolation level 비교 + 
+
+[width 500, options=header, cols="4*^"]
+.*Oracle Isolation Level*
+|====
+|Isolation level |Dirty Read |Non-repeatable read |Phantom read
+|Read Uncommitted 
+|허용
+|허용
+|허용
+
+|Read Committed 
+|허용하지 않음
+|허용
+|허용
+
+|Repeatable Read 
+|허용하지 않음
+|허용하지 않음
+|허용
+
+|Serializable
+|허용하지 않음
+|허용하지 않음
+|허용하지 않음
+|====
+
+[width 500, options=header, cols="4*^"]
+.*PostgreSQL Isolation Level*
+|====
+|Isolation level
+|Dirty Read
+|Non-repeatable read
+|Phantom read
+
+|Read Uncommitted 
+|허용되나 PostgreSQL에서 지원하지 않음
+|허용
+|허용
+
+|Read Committed 
+|허용하지 않음
+|허용
+|허용
+
+|Repeatable Read 
+|허용하지 않음
+|허용하지 않음
+|허용되나 PostgreSQL에서 지원하지 않음
+
+|Serializable
+|허용하지 않음
+|허용하지 않음
+|허용하지 않음
+|====
+
+[width 500, options=header, cols="4*^"]
+=== *기타 특징 비교*
+|====
+|Feature|Oracle|PostgreSQL|비고
+|AutoCommit 
+|OFF
+|OFF
+|기본으로 OFF 이지만, 일부 클라이언트 툴에서는 ON으로 되어있음 (Ex. psql)
+
+|MVCC
+|O
+|O
+| 
+
+|Defualt Isolation level
+|Read Committed
+|Read Committed
+| 
+
+|Supported Isolation level
+|Serializable Read-Only
+|Repeatable Reads / Serializable Read-Only
+| 
+
+| Configure Session Isolation level
+|O
+|O
+|
+
+|Nested Transaction Support
+|O
+|X
+|중첩 트랜잭션을 지원하지 않으나, 세이브포인트를 이용해서 비슷하게 구현할 수 있음.
+
+|Support for Transaction SAVEPOINT
+|O
+|O
+|
+|====
+
+== 전환 방법
+*호환성 : 높음* 
+
+*변환 방법*
+
+- 고립 레벨에 따른 이상 현생 발생 여부가 다르기 때문에, default값인 Read Committed를 사용하지 않는 작업시 확인 필요
+- 중첩 트랜잭션을 사용할 경우, TRANSACTION SAVEPOINT를 이용해 같은 동작을 하도록 변환해야 함.

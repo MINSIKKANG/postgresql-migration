@@ -1,0 +1,119 @@
+= Partition Table
+:toc:
+:toc-title: 목차
+
+== 개요
+
+
+== 파티션 타입 지원 여부
+
+[options="header",cols=""]
+|====================
+|Partition Type |Oracle |PostgreSQL | 대안
+
+|Range Partition |Yes |Yes |
+|List Partition |Yes |Yes |
+|Hash Partition |Yes |Yes |
+|Composite Partition |Yes |Yes |
+|Interval Partition | Yes | No |
+|Partition Advisor |Yes |NO |
+|Reference Partitioning |Yes |Yes |
+|Automatic List Partitioning |Yes | NO |
+|Split / Exchange Partitions |Yes |Yes |ATTACHH / DETACH PARTITION COMMAND
+|Virtual Column Based Partitioning |Yes |No |
+|====================
+
+== 변환 예시
+
+[options="header",cols="2,4,4"]
+|====================
+|Partition Type |Oracle |PostgreSQL
+|Range Partition 
+|CREATE TABLE ORDERS(
+        ORDERIF NUMBER,
+        ORDER_DATE DATE,
+        CUSTOMER_ID NUMBER,
+        TOTAL NUMBER
+        ) PARTITION BY RANGE(ORDER_DATE)
+                (
+                    PARTITION P0 VALUES LESS THAN(TO_DATE('01/01/2017','DD/MM/YYYY')),
+                    PARTITION P1 VALUES LESS THAN(TO_DATE('01/01/2018','DD/MM/YYYY')),
+                    PARTITION P3 VALUES LESS THAN(TO_DATE('01/01/2019','DD/MM/YYYY')),
+                    PARTITION P4 VALUES LESS THAN(TO_DATE('01/01/2020','DD/MM/YYYY'))
+                );
+
+|CREATE TABLE orders (
+        orderif bigint,
+        order_date timestamp,
+        customer_id bigint,
+        total bigint
+) PARTITION BY RANGE (order_date) ;
+
+CREATE TABLE p0 PARTITION OF orders
+FOR VALUES FROM (MINVALUE) TO (' 2017-01-01 00:00:00');
+CREATE TABLE p1 PARTITION OF orders
+FOR VALUES FROM (' 2017-01-01 00:00:00') TO (' 2018-01-01 00:00:00');
+CREATE TABLE p3 PARTITION OF orders
+FOR VALUES FROM (' 2018-01-01 00:00:00') TO (' 2019-01-01 00:00:00');
+CREATE TABLE p4 PARTITION OF orders
+FOR VALUES FROM (' 2019-01-01 00:00:00') TO (' 2020-01-01 00:00:00');
+
+|List Partition
+
+|CREATE TABLE CUSTOMERS(
+        CUSTOMERID NUMBER PRIMARY KEY,
+        BRANCHID NUMBER,
+        STATE        VARCHAR(2),
+        STATUS VARCHAR2(20)
+        )        PARTITION BY LIST (STATE)
+                (
+                    PARTITION p_southwest VALUES ('AZ', 'UT', 'NM'),
+                    PARTITION p_southeast VALUES ('FZ', 'XT', 'AM'),
+                    PARTITION p_northeast VALUES ('FX', 'GT', 'AY'),
+                    PARTITION p_northwest VALUES ('LZ', 'XK', 'IM')
+                );
+
+|CREATE TABLE customers (
+        customerid bigint NOT NULL,
+        branchid bigint,
+        state varchar(2),
+        status varchar(20)
+) PARTITION BY LIST (state) ;
+ALTER TABLE customers ADD PRIMARY KEY (customerid,state);
+
+CREATE TABLE p_southwest PARTITION OF customers
+FOR VALUES IN ('AZ', 'UT', 'NM');
+CREATE TABLE p_southeast PARTITION OF customers
+FOR VALUES IN ('FZ', 'XT', 'AM');
+CREATE TABLE p_northeast PARTITION OF customers
+FOR VALUES IN ('FX', 'GT', 'AY');
+CREATE TABLE p_northwest PARTITION OF customers
+FOR VALUES IN ('LZ', 'XK', 'IM');
+
+|Hash Partition
+|CREATE TABLE system_log(
+        EVENT_NO NUMBER NOT NULL,
+        EVENT_DATE DATE NOT NULL,
+        EVENT_STR VARCHAR2(500),
+        ERROR_CODE VARCHAR2(10)
+        ) PARTITION BY HASH (ERROR_CODE) PARTITIONS 5;
+
+|CREATE TABLE system_log (
+        event_no bigint NOT NULL,
+        event_date timestamp NOT NULL,
+        event_str varchar(500),
+        error_code varchar(10)
+) PARTITION BY HASH (error_code) ;
+
+CREATE TABLE sys_p315 PARTITION OF system_log
+FOR VALUES WITH (MODULUS 5, REMAINDER 0);
+CREATE TABLE sys_p316 PARTITION OF system_log
+FOR VALUES WITH (MODULUS 5, REMAINDER 1);
+CREATE TABLE sys_p317 PARTITION OF system_log
+FOR VALUES WITH (MODULUS 5, REMAINDER 2);
+CREATE TABLE sys_p318 PARTITION OF system_log
+FOR VALUES WITH (MODULUS 5, REMAINDER 3);
+CREATE TABLE sys_p319 PARTITION OF system_log
+FOR VALUES WITH (MODULUS 5, REMAINDER 4);
+
+|====================

@@ -1,0 +1,28 @@
+[options="header"]
+|====================
+|*Oracle Index Types* |*PostgreSQL Index Support or Equivalent Index*
+|B-Tree Index | B-Tree Index
+|B-Tree Cluster indexes | Not supported
+|Descending Index | ASCENDING/ASC (default) or DESCEMDING/DESC
+|Unique Non-Unique Index | Supported
+|Function-Based Index |PostgreSQL Expression Index
+|BITMAP Index | BRIN index를 대체 사용
+|Composite Index | Multi-column index
+|Index-Organized Tables | PostgreSQL CLUSTER
+|Reverse key index | Not supported d
+|Invisible Index| Not supported (hypopg 익스텐션으로 대체 가능)
+|Local and Global Indexes | Not supported
+|Partial Indexes for Partitioned Tables (Oracle 12c) | Not supported
+|====================
+
+
+[options="header"]
+|====================
+|*Oracle Index Features* |*PostgreSQL Index Support(Yes / No) or Equivalent Index*
+|CREATE INDEX / DROP INDEX | Supported, expect syntax minor differences
+|ALTER INDEX | Supported
+|INDEX REBUILD | REINDEX INDEX
+|REBUILD ONLINE | CONCURRENTLY
+|Index Metadata | SELECT * FROM PG_INDEXES;
+|Index Compression | Oracle Index Key 압축과 직접적으로 동일하지 않음
+|====================

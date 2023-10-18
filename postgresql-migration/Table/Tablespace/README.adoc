@@ -1,0 +1,72 @@
+PostgreSQL에서 사용하는 테이블스페이스 데이터 파일과 관련하여 오라클과 다른 아키텍처를 가지므로 다른 구성 방안 필요
+
+[options="header",cols=""]
+|====================
+|Feature |Oracle |PostgreSQL
+
+|Tablespace
+|Exists as a logical object and made from one or more user-specified or system-generated data files.
+|Logical object that is tied to a specific directory on the disk where datafiles will be created.
+
+|Data file
+|Can be explicitly created and resized by the user. Oracle-Managed-Files (OMF) allow for automatically created data files.
+
+Each data file can contain one or more tables and/or indexes.
+
+|Behavior is more akin to Oracle Managed Files (OMF).
+
+Created automatically in the directory assigned to the tablespace.
+
+Single data file stores information for a specific table or index. Multiple data files can exist for a table or index.
+
+Additional files are created:
+
+Freespace map file Exists in addition to the datafiles themselves. The free space map is stored as a file named with the filen- ode number plus the _fsm suffix.
+
+Visibility Map File Stored with the _vm suffix and used to track which pages are known to have no dead tuples.\
+
+|Creates a new tablespace with system-managed data files
+|CREATE TABLESPACE sales_tbs DATAFILE SIZE 400M;
+|create tablespace sales_tbs LOCATION '/postgresql/data';
+
+|Create a new tablespace with user-managed data files
+|CREATE TABLESPACE sales_tbs DATAFILE '/oradata/sales01.dbf' SIZE 1M AUTOEXTEND ON NEXT 1M;
+|N/A
+
+|Alter the size of a datafile
+|ALTER DATABASE DATAFILE '/oradata/sales01.dbf' RESIZE 100M;
+|N/A
+
+|Add a datafile to an existing tablespace
+|ALTER TABLESPACE sales_tbs ADD DATAFILE '/oradata/sales02.dbf' SIZE 10M;
+|N/A
+
+|Per-database tablespace
+|Supported as part of the Oracle 12c Multi Tenant architecture. Different dedicated tablespaces can be created for different pluggable databases and set as the default tablespace for a PDB:
+ALTER SESSION SET CONTAINER =
+'sales';
+
+CREATE TABLESPACE sales_tbs DATAFILE '/oradata/sales01.dbf' SIZE 1M AUTOEXTEND ON NEXT 1M;
+
+ALTER DATABASE sales TABLESPACE sales_tds;
+|Tablespaces are shared across all databases but a default tablespace can be cre- ated and configured for the database:
+
+create tablespace sales_tbs LOCATION '/postgresql/data';
+
+CREATE DATABASE sales OWNER
+sales_app TABLESPACE sales_tbs;
+
+|Metadata tables
+|Data Dictionary tables are stored in the SYSTEM tablespace.
+|System Catalog tables are stored in the pg_ global tablespace
+
+|Tablespace data encryption
+|Supported
+
+Supported using transparent data encryption.
+
+Encryption and decryption are handled seamlessly. Users do not have to modify the application to access the data.
+
+
+|Supported
+|====================

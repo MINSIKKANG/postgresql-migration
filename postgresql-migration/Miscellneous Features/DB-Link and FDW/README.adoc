@@ -1,0 +1,36 @@
+* Oracle 과 구성 방법이 다르며, PostgreSQL 에서 구현 시 PostgreSQL contrib 설치 후 Extension 생성하여 사용합니다.*
+
+* 아래는 Oracle 과 PostgreSQL 의 DB LINK 관련한 구문에 대한 차이를 정리한 표입니다. *
+
+[options="header"]
+|====================
+|Description | Oracle | PostgreSQL
+|Create database link 
+| CREATE DATABASE LINK remote CONNECT TO username IDENTIFIED BY password USING 'remote';
+| Not Supported.
+You have to manually open the connection to the remote database in your sessions / queries:
+SELECT dblink_connect('myconn', 'dbname=postgres port=5432 host=hostname user=username password=password');
+
+|Query using a database link
+|SELECT * FROM employees@remote;
+|SELECT * FROM dblink ('myconn','SELECT * FROM employees') AS p(id int,fullname text, address text);
+
+|DML using database link
+|INSERT INTO employees@remote (employee_id, last_name, email, hire_ date, job_id) VALUES (999, 'Claus', 'sclaus@example.com', SYSDATE, 'SH_CLERK');
+|SELECT * FROM dblink ('myconn',$$INSERT into employ- ees VALUES (45,'Dan','South side 7432, NY')$$) AS t(id int, name text, address text);
+
+|Heterogeneous database link connections, such as Oracle to PostgreSQL or vice-versa
+|Supported.
+|create extension oracle_fdw not supported by Amazon RDS.
+
+|Run DDL via a database link
+|Not supported directly, but you can run a procedure or create a job on the remote database and executes the desired DDL commands.
+dbms_job@remote.submit( l_job, 'execute immediate ''create table t ( x int
+)''' ); commit;
+|SELECT * FROM dblink ('myconn',$$CREATE table my_ remote_tbl (a int, b text)$$) AS t(a text);
+
+|Delete a database link
+|drop database link remote;
+|Not supported.
+Close the DBLink connection instead.
+SELECT dblink_disconnect('myconn');

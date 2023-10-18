@@ -1,0 +1,68 @@
+= DBMS_SQL Package
+:toc:
+:toc-title: 목차
+
+== 개요
+Oracle DBMS_SQL 패키지는 일반적으로 PL/SQL 패키지, 함수 또는 프로시저 내에서 동적 SQL 문, DML 명령 및 DDL 명령을 구문 분석하고 실행할 수 있는 풍부한 API를 제공합니다. +
+Oracles DBMS_SQL을 사용하면 SQL 커서를 매우 세분화하여 제어할 수 있으며 특정 경우에 커서 성능을 향상시킬 수 있으며 DBMS_SQL PL/SQL 인터페이스를 사용하여 커서에서 데이터 열기, 구문 분석, 바인딩, 실행 및 가져오기에 대한 관리 및 제어 방식을 제공할 수 있습니다.
+
+== 전환방법
+*호환성 : 매우 낮음* + 
+PostgreSQL은 프로그래밍 커서의 세분화된 제어를 지원하지 않으므로 Oracle DBMS_SQL에 해당하는 기능이 없습니다.
+
+그러나 PostgreSQL PL/pgSQL을 사용하여 SQL 문을 동적으로 구문 분석하고 실행할 수 있습니다.
+SELECT 문과 함께 FOR 루프를 사용하여 동적 커서를 만듭니다.
+
+== 예시
+
+1. FOR를 SELECT와 함께 사용하여 동적 커서 생성
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION GetErrors ()
+RETURNS VARCHAR
+AS
+$$
+DECLARE
+_currow RECORD; 
+msg VARCHAR(200);
+TITLE VARCHAR(10);
+CODE_NUM VARCHAR(10);
+BEGIN
+msg := '';
+
+FOR _currow IN SELECT TITLE, CODE_NUM, count(*) FROM A group by TITLE, CODE_NUM LOOP
+TITLE := _currow.TITLE;
+CODE_NUM := _currow.CODE_NUM;
+msg := msg || rpad(TITLE,20) || rpad(CODE_NUM,20);
+END LOOP;
+RETURN
+msg;
+
+END;
+$$ LANGUAGE plpgsql;
+----
+
+2. 커서를 만든 다음 주어진 SQL로 실행하기 위해 엽니다.
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION GetErrors () RETURNS VARCHAR AS $$
+DECLARE
+  refcur refcursor;
+  c_id integer;
+  title varchar(10);
+  code_num varchar(10);
+  alert_mesg varchar(1000) := '';
+BEGIN
+  OPEN refcur FOR execute('select * from Errors');
+  loop
+    fetch refcur into title, code_num;
+      if no found then
+        exit;
+       end if;
+      alert_mesg := alert_mesg || rpad(title,20) || rpad(code_num,20);
+     end loop;
+close refcur;
+return alert_mesg;
+END;
+$$ LANGUAGE plpgsql
+----

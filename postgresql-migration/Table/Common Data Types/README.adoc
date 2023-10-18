@@ -1,0 +1,73 @@
+
+* DATE and TIME DATA Types
+[options="header",cols=""]
+|====================
+|Data Type											|PostgreSQL Data Type/Alternative Data Type 	|PostgreSQL Support (No Conversion)
+|DATE                          	|TIMESTAMP(0)                              	  |Yes                               
+|TIMESTAMP(p)                  	|TIMESTAMP(p)                               	|Yes                               
+|TIMESTAMP(p)WITH TIME ZONE    	|TIMESTAMP(p) WITH TIME ZONE                 	|Yes                               
+|INTERVAL YEAR(p) TO MONTH     	|INTERVAL YEAR TO MONTH                      	|Yes                               
+|INTERVAL DAY (p) TO SECOND (s)	|INTERVAL DAY TO SECOND(s)                   	|Yes                               
+|====================
+
+* Numerical Data Types
+[options="header",cols=""]
+|====================
+|Data Type				|PostgreSQL Data Type/ Alternative Data Type|PostgreSQL Support (No Conversion)
+|NUMBER           |DOUBLE PRECISION                           |No                                
+|NUMBER(*)        |DOUBLE PRECISION                           |No                                
+|NUMBER(p,s)      |DECIMAL(p,s)                               |No                                
+|FLOAT(p)         |Double Precision                           |No                                
+|DEC(p,s)         |DEC(p,s)                                   |Yes                               
+|DECIMAL(p,s)     |DECIMAL(p,s)                               |Yes                               
+|INT              |INTEGER / NUMERIC (38,0)                   |Yes                               
+|INTEGER          |INTEGER / NUMERIC (38,0)                   |Yes                               
+|SMALLINT         |SMALLINT                                   |Yes                               
+|REAL             |DOUBLE PRECISION                           |No                                
+|DOUBLE PRECISION |DOUBLE PRECISION                           |Yes                               
+|====================
+
+* Character Data Types
+[options="header",cols=""]
+|====================
+|Data Type             |PostgreSQL Data Type/ Alternative Data Type	|PostgreSQL Support (No Conversion)
+|CHAR(n)               |CHAR(n)                                      |Yes                               
+|CHARACTER(n)          |CHARACTER(n)                                 |Yes                               
+|NCHAR(n)              |CHAR(n)                                      |No                                
+|VARCHAR(n)            |VARCHAR(n)                                   |Yes                               
+|NCHAR VARYING(n)      |CHARACTER VARYING(n)                         |No                                
+|VARCHAR2(n)Oracle 11g |VARCHAR(n)                                   |No                                
+|VARCHAR2(n)Oracle 12g |VARCHAR(n)                                   |No                                
+|NVARCHAR2(n)          |VARCHAR(n)                                   |No                                
+|LONG                  |TEXT                                         |No                                
+|RAW(n)                |BYTEA                                        |No                                
+|LONG RAW              |BYTEA                                        |No                                
+|====================
+
+
+* Large Object Data Types
+[options="header",cols=""]
+|====================
+|Data Type |PostgreSQL Data Type/ Alternative Data Type          |PostgreSQL Support (No Conversion)
+|BFILE     |VARCHAR (255) / CHARACTER VARYING (255)              |No                                
+|BLOB      |BYTEA                                                |No                                
+|CLOB      |TEXT                                                 |No                                
+|NCLOB     |TEXT                                                 |No                                
+|====================
+
+* Various Data Types
+[options="header",cols=""]
+|====================
+|Data Type        |PostgreSQL Data Type/ Alternative Data Type	|PostgreSQL Support (No Conversion)
+|XMLTYPE          |XML                                        	|No                                
+|BOOLEAN          |BOOLEAN                                    	|Yes                               
+|ROWID            |CHARACTER (255)                            	|No                                
+|UROWID(n)        |CHARACTER VARYING                          	|No                                
+|SDO_GEOMETRY     |See PostgreSQL PostGIS extension           	|No                                
+|SDO_TOPO_GEOMETRY|See PostgreSQL PostGIS extension           	|No                                
+|SDO_GEORASTER    |See PostgreSQL PostGIS extension           	|No                                
+|ORDDicom    |X           	|No                               
+|ORDDoc    |X           	|No                               
+|ORDImage    |X           	|No                               
+|ORDDVideo    |X           	|No                               
+|====================

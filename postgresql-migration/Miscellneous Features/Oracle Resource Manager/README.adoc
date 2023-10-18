@@ -1,0 +1,9 @@
+= Oracle Resource Manager
+:toc:
+:toc-title:
+
+== 개요
+Oracle Database Resource Manager는 system resource 및 dbms resource를 포함한 다중 부하(multiple workload)를 관리할 수 있는 기능으로 시스템의 자원 배분을 효율적으로 수행
+
+== 전환 방법
+PostgreSQL 에서는 지원하지 않음

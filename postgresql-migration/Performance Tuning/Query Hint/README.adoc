@@ -1,0 +1,26 @@
+*PostgreSQL 은 Oracle Optimizer Hints 기능을 지원하지 않습니다*
+
+*하지만 세션 수준에서 Optimizer 가 선택한 실행 계획의 동작에 영향을 주는 Query Plan Paramater 를 제공합니다.*
+
+*실행 계획은 SQL 쿼리에서 생성됩니다.*
+
+PostgreSQL Query Plan Parameters
+
+[cols="4,5,1"]
+|====================
+|enable_indexscan (boolean)
+|query planner의 index-scan plan 유형 사용을 활성화하거나 비활성화합니다. 
+|Default - ON
+
+|enable_mergejoin (boolean)
+|query planner의 merge-join plan 유형 사용을 활성화하거나 비활성화합니다. 
+|Default - ON
+
+|seq_page_cost (floating point)
+|sequential fetches의 일부인 disk page fetch 비용에 대한 플래너의 추정치를 설정합니다. 
+|Default - 0.1
+
+|enable_hashagg (boolean)
+|query planner의 hashed aggregation plan 유형 사용을 활성화하거나 비활성화합니다. 
+|Default - ON
+|====================

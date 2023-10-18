@@ -1,0 +1,47 @@
+= Virtual Column
+:toc:
+:toc-title: 목차
+
+== 개요
+오라클의 가상 컬럼 은 일반 컬럼 처럼 보여지나, 실제 데이터 베이스에 저장된 값이 아닌 계산된 값들입니다. + 
+다른 가상 컬럼을 베이스로 만들어질 수 없으며, 같은 테이블에 있는 컬럼만 참조할 수 있습니다. + 
+
+- Virtual Column 특징
+** 가상 컬럼은 제약조건, 인덱스, 파티션, 외래키 등이 적용 가능합니다 + 
+** DML을 이용하여 데이터를 조작할 수 없습니다.
+** WHERE 조건으로 사용될 수 있습니다.
+** 인덱스 생성 시, Function-based Index로 생성 됩니다.
+** Index-organized Table, external, objects, Clusters, Temporary Table을 지원하지 않습니다.
+** 가상 컬럼 표현식의 반환 값은 항상 스칼라 값 입니다.
+
+== 비교 및 예시
+
+=== Oracle
+[source, sql]
+----
+CREATE TABLE EMPLOYEES (
+    EMPLOYEE_ID NUMBER,
+    FIRST_NAME VARCHAR2(20),
+    LAST_NAME VARCHAR2(25),
+    USER_NAME VARCHAR2(25),
+    EMAIL AS (LOWER(USER_NAME) || '@tmax.co.kr'),
+    HIRE_DATE DATE,
+    BASE_SALARY NUMBER,
+    SALES_COUNT NUMBER,
+    FINAL_SALARY NUMBER GENERATED ALWAYS AS (CASE WHEN SALES_CONT >= 10 THEN BASE_SALARY + (BASE_SALARY * (SALES_COUNT * 0.05)) END) VIRTUAL
+);
+
+INSERT INTO EMPLOYEES(EMPLOYEE_ID, FIRST_NAME, LAST_NAME, USER_NAME, HIRE_DATE, BASE_SALARY, SALES_COUNT) VALUES(1, 'John', 'Smith', 'jsmith', '17-JUN-2003', 5000, 21);
+
+SELECT email FROM EMPLOYEES;
+EMAIL FINAL_SALARY
+jsmith@tmax.co.kr 10250
+----
+
+=== PostgreSQL
+[source, sql]
+----
+
+----
+
+== 전환방법

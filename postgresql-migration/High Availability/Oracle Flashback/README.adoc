@@ -1,0 +1,1 @@
+지원하지 않으나, PostgresSQL PITR 방식으로 구현은 가능함

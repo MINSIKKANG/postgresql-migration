@@ -1,0 +1,95 @@
+= OLAP functions vs Windows functions
+:toc:
+:toc-title: 목차
+
+
+== 개요
+Oracle의 OLAP(Online analytical processing) 함수는 대규모 비즈니스 데이터베이스를 구성하고 복잡한 분석을 지원하는 기술입니다. + 
+ +
+
+PostgreSQL에서 이에 대응하는 함수로는 Windows Functions가 있습니다.
+
+== 비교
+[options="header"]
+|===
+|Oracle OLAP |Return Type |PostgreSQL Windows Functions|Return Type |변환 가능 여부
+
+|Count
+|Number
+|Count
+|bigint
+|O
+
+|Max
+|Number
+|Max
+|numeric, string, date / time, network or enum type
+|O
+
+|Avg
+|Number
+|Avg
+|numeric, double, otherwise same datatype as the argument
+|O
+
+|Sum
+|Number
+|Sum
+|bigint, otherwise same datatype as the argument
+|O
+
+|rank()
+|Number
+|rank()
+|bigint
+|O
+
+|dense_rank()
+|Number
+|dense_rank()
+|bigint
+|O
+
+|percent_rank()
+|Number
+|percent_rank()
+|double
+|O
+
+|cume_dist()
+|Number
+|cume_dist()
+|double
+|O
+
+|ntile()
+|Number
+|ntile()
+|integer
+|O
+
+|lag()
+|입력 값과 같은 타입을 반환
+|lag()
+|입력 값과 같은 타입을 반환
+|O
+
+|lead()
+|입력 값과 같은 타입을 반환
+|lead()
+|입력 값과 같은 타입을 반환
+|O
+
+|first_value()
+|입력 값과 같은 타입을 반환
+|first_value()
+|입력 값과 같은 타입을 반환
+|O
+
+|last_value()
+|입력 값과 같은 타입을 반환
+|last_value()
+|입력 값과 같은 타입을 반환
+|O
+|===
+

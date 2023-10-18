@@ -1,0 +1,183 @@
+= FUNCTION
+:toc:
+:toc-title: 목차
+:sectlinks:
+:sectnums:
+
+== 개요
+
+- postgreSQL (Function) : https://www.postgresql.org/docs/current/sql-createfunction.html
+
+주로 간단한 연산, 수치 변환 등 위해 사용하며 PROCEDURE과 유사하나 결과 값을 무조건 반환 해야 합니다. + 
+
+== FUNCTION 문법
+ 
+=== PL/SQL
+[source, sql]
+----
+CREATE [OR REPLACE] FUNCTION function_name
+( Parameter name 1 datatype,
+  Parameter name 2 datatype, ....  )
+RETURN return_datatype     
+IS [AS]         
+     declaration;     
+     [ ..... ]
+BEGIN         
+     <function_body>         
+     [ ..... ]
+RETURN 변수; 
+END;
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+CREATE [ OR REPLACE ] FUNCTION function_name 
+( Parameter name 1 datatype,
+  Parameter name 2 datatype, ....  )
+RETURNS return_datatype 
+AS 
+$variable_name$
+     DECLARE
+           declaration ; 
+           [ .... ] 
+     BEGIN 
+           <function_body>
+           [ .... ] 
+           RETURN { variable_name | value }
+     END ;  LANGUAGE plpgsql ; 
+
+----
+
+== Example 
+
+=== PL/SQL
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION "HYPERSQL".MEMBER 
+(
+    MEMBER_ID      NUMBER ,
+    MEMBER_NAME  VARCHAR2,
+    MEMBER_STATUS   VARCHAR2    
+) 
+RETURN NUMBER
+IS
+   M_DAYS   NUMBER;
+BEGIN
+         select trunc(b.mod_date) - trunc(a.mod_date) INTO M_DAYS
+           from ( select MEMBER_id,
+                         max(mod_date) as mod_date,
+                         now_activity
+                    from MEMBER_HIST
+                   where MEMBER_id = H_MEMBER_ID
+                     and now_activity = P_MEMBER_STATUS
+                   group by MEMBER_id, now_activity) a,
+                ( select MEMBER_id,
+                          max(mod_date) as mod_date,
+                          now_activity
+                     from MEMBER_HIST
+                    where MEMBER_id = P_MEMBER_id
+                      and now_activity = P_MBMBER_STATUS
+                    group by MEMBER_id, now_activity) b
+          where a.MEMBER_id = b.MEMBER_id;                      
+    RETURN M_DAYS;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN null;
+END MBMBER;
+
+
+
+----
+
+=== PL/pgSQL 
+[source, sql]
+----
+CREATE OR REPLACE FUNCTION HYPERSQL.MEMBER 
+(
+    MEMBER_ID      bigint ,
+    MEMBER_NAME  varchar,
+    MEMBER_STATUS   varchar    
+) 
+RETURNS bigint
+AS
+$MB$
+DECLARE
+   M_DAYS   bigint;
+BEGIN
+         select trunc(b.mod_date) - trunc(a.mod_date) INTO M_DAYS
+           from ( select MEMBER_id,
+                         max(mod_date) as mod_date,
+                         now_activity
+                    from MEMBER_HIST
+                   where MEMBER_id = H_MEMBER_ID
+                     and now_activity = P_MEMBER_STATUS
+                   group by MEMBER_id, now_activity) a,
+                ( select MEMBER_id,
+                          max(mod_date) as mod_date,
+                          now_activity
+                     from MEMBER_HIST
+                    where MEMBER_id = P_MEMBER_id
+                      and now_activity = P_MBMBER_STATUS
+                    group by MEMBER_id, now_activity) b
+          where a.MEMBER_id = b.MEMBER_id;                      
+    RETURN M_DAYS;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN null;
+END 
+$MB$ LANGUAGE plpgsql; 
+----
+
+[width 500, options=header, cols="5*^"]
+.*FUNCTION 비교 표*
+|====
+|동작
+|Oracle
+|PostgreSQL
+|호환 여부
+|비고
+
+|Data type 
+|varchar2
+|varchar or text 
+|Δ
+|보통은 varchar 를 사용 하지만, 길이 제한이 없을시에는 text를 사용 할 수도 있음.
+
+|RETURN, IS 
+|RETURN, IS 
+|RETURNS, AS 
+|Δ
+|
+
+|EXCUTE
+|
+|
+|O
+|
+
+
+
+|====
+
+ 
+== 전환방법
+
+- Schema 
+** "Schema_name" 구문을 Schema_name 으로 변경하여 사용해야 합니다.
+
+- RETURN 구문
+** RETURN 구문을 RETURNS 로 변경하여 사용해야 합니다. 
+
+- body 시작 구문 
+** IS 구문을 AS $variable_name$ 으로 변경하여 사용해야 합니다.
+
+- function end 구문
+** END [FUNCTION_NAME] 구문을 END $variable_name$ 로 변경 후 LANGUAGE plpgsql; 추가 하여 사용해야 합니다. 
+
+
+*변환 방법* + 
+ IDENTITY COLUMN 기능을 그대로 사용시 Table의 Column Data Type만 PostgreSQL에 맞는 타입으로 변환하면 됩니다. + 
+ Data Type은 xref:../../Table/Common Data Types/README.adoc#[Table]항목을 참고
+
